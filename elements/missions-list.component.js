@@ -9,16 +9,34 @@ export class MissionsList extends connect(store)(LitElement) {
     super();
 
     this.missions = [];
+    this.errors = [];
   }
 
   static get properties() {
     return {
-      missions: Array
+      missions: Array,
+      errors: Array
     };
+  }
+
+  hasError() {
+    return this.errors.indexOf('missions') >= 0
+      ? html`
+          <div class="error">There must be at least one mission in every quest!</div>
+        `
+      : html``;
   }
 
   render() {
     return html`
+      <style>
+        .error {
+          color: red;
+        }
+      </style>
+
+      <h2>Missions</h2>
+      ${this.hasError()}
       <ul>
         ${this.missions.map(
           (m) =>
@@ -33,6 +51,7 @@ export class MissionsList extends connect(store)(LitElement) {
 
   stateChanged(state) {
     this.missions = state.missions;
+    this.errors = state.errors;
   }
 }
 

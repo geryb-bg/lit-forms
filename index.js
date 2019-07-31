@@ -1,1 +1,1 @@
-import './elements/missions-list.component';
+import './elements/quest.component';

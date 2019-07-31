@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit-element';
 import { connect } from 'pwa-helpers';
 import { store } from '../store';
 import { missionsUpdated } from '../actions/missions-updated.action';
+import { errorsDetected } from '../actions/errors-detected.action';
 
 export class MissionsForm extends connect(store)(LitElement) {
   constructor() {
@@ -35,11 +36,10 @@ export class MissionsForm extends connect(store)(LitElement) {
           <label>
             Description:
           </label>
-          <textarea class="${hasError('description')}" type="input" name="description"> </textarea>
+          <textarea class="${hasError('description')}" type="input" name="description"></textarea>
         </div>
         <div>
-          <button type="button" @click="${() => this.cancel()}">Cancel</button>
-          <button type="submit" class="save">Save</button>
+          <button type="submit">Save</button>
         </div>
       </form>
     `;
@@ -54,16 +54,16 @@ export class MissionsForm extends connect(store)(LitElement) {
       if (indexOfError >= 0) {
         errorList.splice(indexOfError, 1);
       }
-    }
-    this.errors = [...errorList];
+    } 
+    store.dispatch(errorsDetected(errorList));
   }
 
   submit(e) {
     e.preventDefault();
     let form = e.target;
-    this.errors = this.checkForErrors(form);
+    let errors = this.checkForErrors(form);
 
-    if (!this.errors.length) {
+    if (!errors.length) {
       let mission = {
         name: form.name.value,
         description: form.description.value
@@ -72,6 +72,8 @@ export class MissionsForm extends connect(store)(LitElement) {
       store.dispatch(missionsUpdated([...this.missions, mission]));
       form.reset();
     }
+
+    store.dispatch(errorsDetected(errors))
   }
 
   checkForErrors(form) {
@@ -88,12 +90,9 @@ export class MissionsForm extends connect(store)(LitElement) {
     return errors;
   }
 
-  cancel() {
-    form.reset();
-  }
-
   stateChanged(state) {
     this.missions = state.missions;
+    this.errors = state.errors;
   }
 }
 
