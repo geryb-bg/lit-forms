@@ -1,1 +1,1 @@
-import './elements/missions-form.component';
+import './elements/missions-list.component';

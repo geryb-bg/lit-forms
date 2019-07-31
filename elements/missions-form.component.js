@@ -1,20 +1,17 @@
 import { LitElement, html } from 'lit-element';
+import { connect } from 'pwa-helpers';
+import { store } from '../store';
+import { missionsUpdated } from '../actions/missions-updated.action';
 
-export class MissionsForm extends LitElement {
+export class MissionsForm extends connect(store)(LitElement) {
   constructor() {
     super();
-
-    this.mission = {
-      name: '',
-      description: ''
-    };
 
     this.errors = [];
   }
 
   static get properties() {
     return {
-      mission: Object,
       errors: Array
     };
   }
@@ -32,13 +29,13 @@ export class MissionsForm extends LitElement {
       <form @submit="${(e) => this.submit(e)}" @change="${(e) => this.formValueUpdated(e)}">
         <div>
           <label>Name: </label>
-          <input class="${hasError('name')}" type="input" name="name" .value="${this.mission.name}" />
+          <input class="${hasError('name')}" type="input" name="name" />
         </div>
         <div>
           <label>
             Description:
           </label>
-          <textarea class="${hasError('description')}" type="input" name="description" .value="${this.mission.description}"> </textarea>
+          <textarea class="${hasError('description')}" type="input" name="description"> </textarea>
         </div>
         <div>
           <button type="button" @click="${() => this.cancel()}">Cancel</button>
@@ -67,19 +64,13 @@ export class MissionsForm extends LitElement {
     this.errors = this.checkForErrors(form);
 
     if (!this.errors.length) {
-      this.mission = {
-        ...this.mission,
+      let mission = {
         name: form.name.value,
         description: form.description.value
       };
 
-      //save your mission
-      this.mission = {
-        name: '',
-        description: ''
-      };
+      store.dispatch(missionsUpdated([...this.missions, mission]));
       form.reset();
-      alert('Mission Saved');
     }
   }
 
@@ -98,11 +89,11 @@ export class MissionsForm extends LitElement {
   }
 
   cancel() {
-    this.mission = {
-      name: '',
-      description: ''
-    };
     form.reset();
+  }
+
+  stateChanged(state) {
+    this.missions = state.missions;
   }
 }
 
