@@ -9,15 +9,11 @@ import './missions-list.component';
 export class Quest extends connect(store)(LitElement) {
   constructor() {
     super();
-
-    this.missions = [];
     this.errors = [];
   }
 
   static get properties() {
     return {
-      missions: Array,
-      quest: Object,
       errors: Array
     };
   }
@@ -37,6 +33,7 @@ export class Quest extends connect(store)(LitElement) {
     let errors = this.pageValid();
     if (!errors.length) {
       //save quest and missions here
+      console.log("saved");
     }
     store.dispatch(errorsDetected(errors));
   }
