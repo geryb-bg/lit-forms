@@ -7,17 +7,6 @@ import './quest-editor.component';
 import './missions-list.component';
 
 export class Quest extends connect(store)(LitElement) {
-  constructor() {
-    super();
-    this.errors = [];
-  }
-
-  static get properties() {
-    return {
-      errors: Array
-    };
-  }
-
   render() {
     return html`
       <h1>Create Quest</h1>
