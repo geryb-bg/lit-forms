@@ -3,6 +3,7 @@ import { connect } from 'pwa-helpers';
 import { store } from '../store';
 import { circle } from '../svg';
 import { missionToUpdateChanged } from '../actions/mission-to-update-changed.action';
+import missionsService from '../services/missions.service';
 
 import './missions-form.component';
 
@@ -24,6 +25,7 @@ const styles = html`
       max-width: inherit;
       margin: 0 0 0.5em;
       padding: 0 0 0 3em;
+      align-items: center;
     }
 
     li > span > svg {
@@ -40,6 +42,7 @@ const styles = html`
       background: none;
       border: none;
       box-shadow: 2px 2px 2px black;
+      margin: 0 0.3em 0 0;
     }
   </style>
 `;
@@ -71,6 +74,7 @@ export class MissionsList extends connect(store)(LitElement) {
   renderAdd() {
     return !this.missionToUpdate.missionId
       ? html`
+          <hr>
           <missions-form></missions-form>
         `
       : html``;
@@ -87,6 +91,7 @@ export class MissionsList extends connect(store)(LitElement) {
         <span>
           ${content} &nbsp;&nbsp;
           <button @click="${(e) => this.showEditor(mission)}">Edit</button>
+          <button @click="${(e) => this.deleteMission(mission)}">Delete</button>
         </span>
       `;
     }
@@ -121,6 +126,10 @@ export class MissionsList extends connect(store)(LitElement) {
 
   showEditor(mission) {
     store.dispatch(missionToUpdateChanged(mission));
+  }
+
+  deleteMission(mission) {
+    missionsService.deleteMission(this.missions, mission);
   }
 
   stateChanged(state) {

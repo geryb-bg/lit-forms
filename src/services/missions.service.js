@@ -29,6 +29,13 @@ class MissionsService {
     let missions = [...allMissions, { ...newMission, missionId }];
     this.store.dispatch(missionsUpdated(missions));
   }
+
+  deleteMission(allMissions, deletedMission) {
+    let indexOfDeleted = allMissions.indexOf(deletedMission);
+    let missions = [...allMissions];
+    missions.splice(indexOfDeleted, 1);
+    this.store.dispatch(missionsUpdated(missions));
+  }
 }
 
 export default new MissionsService(store);
