@@ -10,7 +10,9 @@ const styles = html`
   <style>
     .main {
       padding: 1em;
-      font-family: "Lucida Grande", Arial, sans-serif
+      font-family: "Lucida Grande", Arial, sans-serif;
+      max-width: 60em;
+      margin: 0 auto;
     }
 
     button {

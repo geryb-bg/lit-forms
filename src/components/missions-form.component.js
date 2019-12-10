@@ -1,16 +1,20 @@
 import { LitElement, html } from 'lit-element';
 import { connect } from 'pwa-helpers';
 import { store } from '../store';
-import { missionsUpdated } from '../actions/missions-updated.action';
 import { errorsDetected } from '../actions/errors-detected.action';
 import { sharedStyles } from '../styles/shared';
+import missionsService from '../services/missions.service';
+import { missionToUpdateChanged } from '../actions/mission-to-update-changed.action';
 
 const styles = html`
   <style>
-    form > div > button {
-      flex: 0 0 auto;
+    button {
       font-size: 1em;
       background: none;
+      width: 10em;
+    }
+    form > div > button {
+      flex: 0 0 auto;
     }
     form > div > div {
       flex: 1 1 auto;
@@ -27,8 +31,29 @@ export class MissionsForm extends connect(store)(LitElement) {
 
   static get properties() {
     return {
-      errors: Array
+      errors: Array,
+      mission: Object
     };
+  }
+
+  renderButtons() {
+    if (!this.mission.missionId) {
+      return html`
+        <div>
+          <div></div>
+          <button type="submit">Add Mission</button>
+        </div>
+      `;
+    }
+
+    return html`
+      <div>
+        <div>
+          <button @click="${(e) => this.cancelEdit()}">Cancel</button>
+        </div>
+        <button type="submit">Update Mission</button>
+      </div>
+    `;
   }
 
   render() {
@@ -43,7 +68,12 @@ export class MissionsForm extends connect(store)(LitElement) {
       >
         <div>
           <label>Name: </label>
-          <input class="${hasError('name')}" type="input" name="name" />
+          <input
+            class="${hasError('name')}"
+            type="input"
+            name="name"
+            .value="${this.mission.name}"
+          />
         </div>
         <div>
           <label>
@@ -53,12 +83,10 @@ export class MissionsForm extends connect(store)(LitElement) {
             class="${hasError('description')}"
             type="input"
             name="description"
+            .value="${this.mission.description}"
           ></textarea>
         </div>
-        <div>
-          <div></div>
-          <button type="submit">Add Mission</button>
-        </div>
+        ${this.renderButtons()}
       </form>
     `;
   }
@@ -83,12 +111,18 @@ export class MissionsForm extends connect(store)(LitElement) {
 
     if (!errors.length) {
       let mission = {
+        ...this.mission,
         name: form.name.value,
         description: form.description.value
       };
 
-      store.dispatch(missionsUpdated([...this.missions, mission]));
+      if (mission.missionId) {
+        missionsService.updateMission(this.missions, mission);
+      } else {
+        missionsService.createMission(this.missions, mission);
+      }
       form.reset();
+      store.dispatch(missionToUpdateChanged({ missionId: 0, name: '', description: '' }));
     }
 
     store.dispatch(errorsDetected(errors));
@@ -108,9 +142,15 @@ export class MissionsForm extends connect(store)(LitElement) {
     return errors;
   }
 
+  cancelEdit() {
+    store.dispatch(missionToUpdateChanged({ missionId: 0, name: '', description: '' }));
+    store.dispatch(errorsDetected([]));
+  }
+
   stateChanged(state) {
     this.missions = state.missions;
     this.errors = state.errors;
+    this.mission = state.missionToUpdate;
   }
 }
 

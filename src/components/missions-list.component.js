@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit-element';
 import { connect } from 'pwa-helpers';
 import { store } from '../store';
 import { circle } from '../svg';
+import { missionToUpdateChanged } from '../actions/mission-to-update-changed.action';
 
 import './missions-form.component';
 
@@ -14,21 +15,31 @@ const styles = html`
 
     ul {
       display: block;
+      list-style: none;
+      padding: 0;
     }
 
-    li {
+    li > span {
       display: flex;
       max-width: inherit;
       margin: 0 0 0.5em;
+      padding: 0 0 0 3em;
     }
 
-    li > svg {
+    li > span > svg {
       width: 1.3em;
       height: 1.3em;
       margin: 0 0.5em 0em -1.8em;
       stroke: var(--app-tertiary-color);
       fill: var(--app-tertiary-color);
       min-width: 30px;
+    }
+
+    li > span > button {
+      font-size: 1em;
+      background: none;
+      border: none;
+      box-shadow: 2px 2px 2px black;
     }
   </style>
 `;
@@ -44,7 +55,8 @@ export class MissionsList extends connect(store)(LitElement) {
   static get properties() {
     return {
       missions: Array,
-      errors: Array
+      errors: Array,
+      missionToUpdate: Object
     };
   }
 
@@ -54,6 +66,37 @@ export class MissionsList extends connect(store)(LitElement) {
           <div class="error-text">There must be at least one mission in every quest!</div>
         `
       : html``;
+  }
+
+  renderAdd() {
+    return !this.missionToUpdate.missionId
+      ? html`
+          <missions-form></missions-form>
+        `
+      : html``;
+  }
+
+  renderMission(mission) {
+    let content = html`
+      ${circle}
+      <strong>${mission.name}:</strong>&nbsp;${mission.description}
+    `;
+
+    if (mission !== this.missionToUpdate) {
+      return html`
+        <span>
+          ${content} &nbsp;&nbsp;
+          <button @click="${(e) => this.showEditor(mission)}">Edit</button>
+        </span>
+      `;
+    }
+
+    return html`
+      <span>
+        ${content}
+      </span>
+      <missions-form></missions-form>
+    `;
   }
 
   render() {
@@ -67,20 +110,23 @@ export class MissionsList extends connect(store)(LitElement) {
           (m) =>
             html`
               <li>
-                ${circle}
-                <strong>${m.name}:</strong>&nbsp;
-                ${m.description}
+                ${this.renderMission(m)}
               </li>
             `
         )}
       </ul>
-      <missions-form></missions-form>
+      ${this.renderAdd()}
     `;
+  }
+
+  showEditor(mission) {
+    store.dispatch(missionToUpdateChanged(mission));
   }
 
   stateChanged(state) {
     this.missions = state.missions;
     this.errors = state.errors;
+    this.missionToUpdate = state.missionToUpdate;
   }
 }
 
