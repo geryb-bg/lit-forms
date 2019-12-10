@@ -3,6 +3,20 @@ import { connect } from 'pwa-helpers';
 import { store } from '../store';
 import { missionsUpdated } from '../actions/missions-updated.action';
 import { errorsDetected } from '../actions/errors-detected.action';
+import { sharedStyles } from '../styles/shared';
+
+const styles = html`
+  <style>
+    form > div > button {
+      flex: 0 0 auto;
+      font-size: 1em;
+      background: none;
+    }
+    form > div > div {
+      flex: 1 1 auto;
+    }
+  </style>
+`;
 
 export class MissionsForm extends connect(store)(LitElement) {
   constructor() {
@@ -21,13 +35,12 @@ export class MissionsForm extends connect(store)(LitElement) {
     const hasError = (name) => (this.errors.indexOf(name) >= 0 ? 'error' : '');
 
     return html`
-      <style>
-        .error {
-          border: 1px solid red;
-        }
-      </style>
+      ${sharedStyles} ${styles}
 
-      <form @submit="${(e) => this.submit(e)}" @change="${(e) => this.formValueUpdated(e)}">
+      <form
+        @submit="${(e) => this.submit(e)}"
+        @change="${(e) => this.formValueUpdated(e)}"
+      >
         <div>
           <label>Name: </label>
           <input class="${hasError('name')}" type="input" name="name" />
@@ -36,10 +49,15 @@ export class MissionsForm extends connect(store)(LitElement) {
           <label>
             Description:
           </label>
-          <textarea class="${hasError('description')}" type="input" name="description"></textarea>
+          <textarea
+            class="${hasError('description')}"
+            type="input"
+            name="description"
+          ></textarea>
         </div>
         <div>
-          <button type="submit">Save</button>
+          <div></div>
+          <button type="submit">Add Mission</button>
         </div>
       </form>
     `;
@@ -54,7 +72,7 @@ export class MissionsForm extends connect(store)(LitElement) {
       if (indexOfError >= 0) {
         errorList.splice(indexOfError, 1);
       }
-    } 
+    }
     store.dispatch(errorsDetected(errorList));
   }
 
@@ -73,7 +91,7 @@ export class MissionsForm extends connect(store)(LitElement) {
       form.reset();
     }
 
-    store.dispatch(errorsDetected(errors))
+    store.dispatch(errorsDetected(errors));
   }
 
   checkForErrors(form) {

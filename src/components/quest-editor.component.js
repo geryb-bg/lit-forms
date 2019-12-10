@@ -3,6 +3,7 @@ import { connect } from 'pwa-helpers';
 import { store } from '../store';
 import { questUpdated } from '../actions/quest-updated.action';
 import { errorsDetected } from '../actions/errors-detected.action';
+import { sharedStyles } from '../styles/shared';
 
 export class QuestEditor extends connect(store)(LitElement) {
   constructor() {
@@ -21,13 +22,12 @@ export class QuestEditor extends connect(store)(LitElement) {
     const hasError = (name) => (this.errors.indexOf(name) >= 0 ? 'error' : '');
 
     return html`
-      <style>
-        .error {
-          border: 1px solid red;
-        }
-      </style>
+      ${sharedStyles}
 
-      <form @change="${(e) => this.formValueUpdated(e)}" @submit="${(e) => e.preventDefault()}">
+      <form
+        @change="${(e) => this.formValueUpdated(e)}"
+        @submit="${(e) => e.preventDefault()}"
+      >
         <div>
           <label>Goal:</label>
           <input class="${hasError('goal')}" name="goal" type="text" />

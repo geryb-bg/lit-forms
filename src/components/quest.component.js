@@ -6,14 +6,35 @@ import { errorsDetected } from '../actions/errors-detected.action';
 import './quest-editor.component';
 import './missions-list.component';
 
+const styles = html`
+  <style>
+    .main {
+      padding: 1em;
+      font-family: "Lucida Grande", Arial, sans-serif
+    }
+
+    button {
+      display: block;
+      margin: 1em auto;
+      font-size: 1.3em;
+      background: none;
+      width: 20em;
+    }
+  </style>
+`;
+
 export class Quest extends connect(store)(LitElement) {
   render() {
     return html`
-      <h1>Create Quest</h1>
-      <quest-editor></quest-editor>
-      <missions-list></missions-list>
-      <div>
-        <button type="button" @click="${() => this.saveQuest()}">Save</button>
+      ${styles}
+
+      <div class="main">
+        <h1>Create Quest</h1>
+        <quest-editor></quest-editor>
+        <missions-list></missions-list>
+        <div>
+          <button type="button" @click="${() => this.saveQuest()}">Save All Changes</button>
+        </div>
       </div>
     `;
   }
@@ -21,8 +42,7 @@ export class Quest extends connect(store)(LitElement) {
   saveQuest() {
     let errors = this.pageValid();
     if (!errors.length) {
-      //save quest and missions here
-      console.log("saved");
+      console.log('saved');
     }
     store.dispatch(errorsDetected(errors));
   }
